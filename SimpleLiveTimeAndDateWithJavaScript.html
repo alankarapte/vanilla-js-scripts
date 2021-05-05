@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Clock</title>
+</head>
+<body>
+
+    <p id="time"></p>
+    <p id="date"></p>
+
+    <script>
+        let timeElement = document.querySelector("#time")
+        let dateElement = document.querySelector("#date")
+
+        setInterval(() => {
+
+            //getting current time
+            let dateTime = new Date();
+            let timeString = "";
+            let dateString = "";
+            let hours = dateTime.getHours();
+            let minutes = dateTime.getMinutes();
+            let seconds = dateTime.getSeconds();
+            let timeSuffix = "";
+
+            //getting to know AM/PM 
+            timeSuffix = (hours > 11) ? "PM" : "AM" ;
+
+            //converting 24hour into 12hour
+            hours = (hours > 12) ? (hour-12) : hours;
+            hours = (hours == 0) ? 12 : hours;
+
+            //getting date in custom format e.g. 'Monday, 5 October 2020'
+            dateString = dateTime.toLocaleDateString(undefined, {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
+            //pad '0' if number less than 10
+            hours = ((hours < 10) ? "0" : "") + hours;
+
+            //generating time string
+            timeString = hours + ":" + minutes + ":" + seconds + " " + timeSuffix;
+
+            timeElement.innerText = `Time : ${timeString}`;
+            dateElement.innerText = `Date : ${dateString}`;
+        }, 1000);
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Alarm Clock</title>
+</head>
+
+<style>
+    * {
+        font-family: 'Trebuchet MS';
+
+    }
+
+    .container {
+        background-color: bisque;
+        padding: 20px;
+        margin: auto;
+        text-align: center;
+        max-width: 50%;
+        min-width: fit-content;
+
+        border-radius: 25px;
+
+    }
+
+    .container header {
+        font-size: 20px;
+        font-weight: bold;
+    }
+
+    .datetime {
+        /* display: ; */
+        border-radius: 25px;
+
+        margin: 20px auto;
+        background-color: blueviolet;
+    }
+
+    .control-section input {
+        border-radius: 25px;
+        outline: none;
+        width: 100%;
+        max-width: fit-content;
+        margin: 10px auto;
+        padding: 10px;
+        font-weight: bold;
+        font-size: 15px;
+
+    }
+
+    #alarmbutton {
+        color: black;
+        font-size: 20px;
+        font-weight: bolder;
+        padding: 15px 25px;
+        border-radius: 25px;
+        background-color: rgb(204, 149, 255);
+        outline: none;
+    }
+
+    #alarmbutton:hover {
+        font-size: 23px;
+        background-color: rgb(41, 41, 245);
+        transition: 0.4s;
+        border-radius: 25px;
+    }
+</style>
+
+<body>
+
+    <div class="container">
+        <header>
+            Simple Alarm
+        </header>
+
+        <div class="control-section">
+            <div class="controls">
+                <div class="datetime">
+                    <input type="date" name="" id="dateinput">
+                    <input type="time" name="" id="timeinput" value="00:00">
+                    <input type="text" name="" id="alarmlabelinput" placeholder="Enter alarm label (optional)">
+                </div>
+            </div>
+            <div class="controls">
+            </div>
+
+            <button type="button" id="alarmbutton">Set Alarm</button>
+        </div>
+
+    </div>
+
+    <script>
+
+        window.onload = () => {
+
+            //here I used 'Immediate Invoked Function Expression' (IIFE)
+            document.getElementById("dateinput").value = (() => {
+                let year = new Date().getFullYear();
+                let month = new Date().getMonth() + 1;
+                let day = new Date().getDate();
+
+                if (month < 10) {
+                    month = "0" + month;
+                }
+
+                if (day < 10) {
+                    day = "0" + day;
+                }
+                return `${year}-${month}-${day}`;
+            })()
+        }
+
+
+
+        function displayLabel(alarmLabel = "") {
+            if (alarmLabel !== "") {
+                document.querySelector(".alarm-banner").style.display = "inline-block";
+                document.querySelector("#alarmlabel").innerText = alarmLabel;
+            }
+        }
+
+        alarmbutton.addEventListener("click", (e) => {
+            let inputDate = document.getElementById("dateinput").value
+            let inputTime = document.getElementById("timeinput").value
+            let alarmLabel = alarmlabelinput.value.trim();
+
+
+            let date = new Date(inputDate);
+            date.setHours(parseInt(inputTime.split(":")[0]));
+            date.setMinutes(parseInt(inputTime.split(":")[1]));
+            date.setSeconds(00);
+
+            let timeToAlarm = date - new Date();
+
+            // we can use 'date > new Date()' instead 'timeToAlarm > 0' 
+            // 'timeToAlarm < 7776000000' date should before 90 month (7776000000 miliseconds = 90 days)
+            if (timeToAlarm > 0 && timeToAlarm < 7776000000) {
+                setTimeout(() => {
+                    console.log("start");
+                    playAlarmMusic(alarmLabel);
+                    console.log("end");
+                   
+                }, timeToAlarm);
+                alarmlabelinput.value = "";
+            } else {
+                console.log("Sorry, your selected time is in past");
+            }
+        });
+
+        function playAlarmMusic(alarmLabel) {
+            let music= new Audio("./music.mp3");
+            music.play().then( (resolve)=>{
+                console.log("prom");
+            } ).then(()=>{
+                alert(alarmLabel)
+                music.pause();
+            });
+        }
+
+
+
+
+    </script>
+
+</body>
+
+</html>

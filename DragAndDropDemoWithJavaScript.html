@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drag & drop demo</title>
+</head>
+
+<style>
+    * {
+        /* margin: 0; */
+    }
+
+    body {
+        background-color: darkslateblue;
+    }
+
+    .box {
+        display: inline-block;
+        background-color: darkgoldenrod;
+        height: 100px;
+        width: 100px;
+        margin: 2px;
+        border: 5px black solid;
+    }
+
+    .hold {
+        border: 5px red solid;
+    }
+
+    .over{
+        background-color: aqua;
+    }
+
+    .hide {
+        display: none;
+    }
+
+    .content {
+        position: relative;
+        background-color: red;
+        cursor: pointer;
+    }
+
+    .content p {
+        background-color: darkgreen;
+    }
+</style>
+
+<body>
+    <div class="box">
+        <div class="content" draggable="true">
+            <p>text</p>
+        </div>
+    </div>
+    <div class="box"></div>
+    <div class="box"></div>
+    <div class="box"></div>
+
+    <script>
+        const content = document.querySelector(".content");
+        const boxes = document.querySelectorAll(".box");
+
+        //adding listner for draggable item
+        content.addEventListener("dragstart", (e) => {
+            console.log("drag start");
+            e.target.className += " hold";
+            setTimeout(() => {
+                e.target.className += " hide";
+            }, 0);
+
+        });
+        content.addEventListener("dragend", (e) => {
+            console.log("drag end");
+            e.target.className = " content";
+
+        });
+
+        //adding listner for item where we going to drop
+        for (const element of boxes) {
+            element.addEventListener("dragover", (e) => {
+                console.log("drag over");
+                e.preventDefault();
+
+            });
+
+            element.addEventListener("dragenter", (e) => {
+                console.log("drag enter");
+                e.target.className += " over";
+
+
+            });
+
+            element.addEventListener("dragleave", (e) => {
+                console.log("drag leave");
+                e.target.className = " box";
+
+            });
+
+            element.addEventListener("drop", (e) => {
+                console.log("drop");
+                e.target.append(content);
+                e.target.className = " box";
+
+            });
+
+        }
+
+        console.log(boxes)
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TODO List</title>
+    <!-- <link rel="stylesheet" href="./bootstrap/css/bootstrap.min.css"> -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+        integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+</head>
+
+<body>
+
+    <div class="container my-5 shadow-lg ">
+        <!-- toast -->
+        <div id="toast-container" aria-live="polite" aria-atomic="true"
+            style="z-index: 1000; position: relative; float: right; ">
+            <!-- Then put toasts within -->
+        </div>
+
+        <div class=" container col-6 ">
+            <p class="text-center my-3 font-weight-bolder pt-5  ">TODO List</p>
+            <form name="todolistform">
+                <div class="form-group">
+                    <label for="Title">Title</label>
+                    <input type="text" class="form-control " id="title" placeholder="Enter title">
+                    <div class="invalid-feedback">
+                        Please choose a title.
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="desc">Description</label>
+                    <textarea class="form-control" id="desc" rows="3"></textarea>
+                    <div class="invalid-feedback">
+                        Please add at least 2 words of Description.
+                    </div>
+                </div>
+                <div class=" text-center">
+                    <button type="button" class="btn-sm btn-dark " id="bttnsave">Save</button>
+                    <button type="button" class="btn-sm btn-primary " id="bttnupdate">update</button>
+                    <button type="button" class="btn-sm btn-info " id="bttnreset">Reset</button>
+                </div>
+            </form>
+            <hr />
+            <p class="font-weight-bold  ">Your list:</p>
+
+            <div class="table-responsive">
+                <table class="table table-dark" id="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Sr.No.</th>
+                            <th scope="col">Title</th>
+                            <th scope="col">Description</th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+        <footer class="footer-copyright text-center bg-dark text-white ">
+            &copy; Alankar Apte 2020
+        </footer>
+    </div>
+
+    <!-- <script src="./jquery/jquery-3.5.1.min.js"></script>
+    <script src="./bootstrap/js/bootstrap.min.js"></script> -->
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+        integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+        integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
+        crossorigin="anonymous"></script>
+
+    <script>
+        let options = {
+            animation: true,
+            delay: 2000,
+            autohide: true
+        }
+        let toastCount = 0;
+        $('#itemAddToast').toast(options);
+        $('#itemDeleteToast').toast(options);
+
+        // theme decides toast bg color- primary, danger
+        function showToast(message, theme = "") {
+            if (theme == "happy") {
+                theme = "bg-primary";
+            } else if (theme == "danger") {
+                theme = "bg-danger";
+            } else {
+                theme = ""
+            }
+            let divElement = document.createElement("div");
+            let toastContainer = document.querySelector("#toast-container");
+            divElement.className = `toast-${++toastCount}`;
+            divElement.innerHTML = `
+                <div id="toast-${toastCount}" class="toast ${theme}" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="toast-header">
+                        <strong class="mr-auto">Hello!</strong>
+                        <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="toast-body">
+                        ${message}
+                    </div>
+                </div>
+           `;
+            toastContainer.appendChild(divElement);
+
+            setTimeout(() => {
+                toastContainer.removeChild(divElement);
+            }, 2000, toastCount);
+
+            $(`#toast-${toastCount}`).toast(options);
+            $(`#toast-${toastCount}`).toast('show');
+
+        }
+
+
+
+
+        let saveButton = document.querySelector("#bttnsave");
+        let updateButton = document.querySelector("#bttnupdate");
+        let resetButton = document.querySelector("#bttnreset");
+        updateButton.hidden = true;
+        let title = document.getElementById("title");
+        let desc = document.getElementById("desc");
+        let todoListArray = [];
+
+        // title.focus();
+        function resetForm() {
+            title.value = "";
+            desc.value = "";
+            title.classList.remove("is-invalid");
+            desc.classList.remove("is-invalid");
+            saveButton.hidden = false;
+            updateButton.hidden = true;
+            title.disabled = false;
+        }
+
+        resetButton.addEventListener("click", () => {
+            resetForm();
+        })
+
+        //individual validation i.e check validation desc input
+        title.addEventListener("input", () => {
+            if (title.value.trim() === "") {
+                title.classList.add("is-invalid");
+            } else {
+                title.classList.remove("is-invalid");
+            }
+        })
+        //individual validation i.e check validation desc input
+        desc.addEventListener("input", () => {
+            if (desc.value.trim().length < 2) {
+                desc.classList.add("is-invalid");
+            } else {
+                desc.classList.remove("is-invalid");
+            }
+        })
+
+        //universal validation i.e check validation for all inputs
+        function formValidate() {
+            let isFormValidated = true;
+            if (title.value.trim() === "") {
+                title.classList.add("is-invalid");
+                isFormValidated = false;
+            } 
+            if (desc.value.trim().length < 2) {
+                desc.classList.add("is-invalid");
+                isFormValidated = false;
+            }
+            if (isFormValidated){
+                title.classList.remove("is-invalid");
+                desc.classList.remove("is-invalid");
+                return isFormValidated;
+            }
+            return isFormValidated;
+
+        }
+
+        document.onload = refreshTable();
+
+        saveButton.addEventListener("click", () => {
+            console.log("save button clicked");
+            if (formValidate()) {
+
+                let titleText = document.getElementById("title").value;
+                let descText = document.getElementById("desc").value;
+
+
+                console.log("Saving list...");
+
+                if (localStorage.getItem("todoList")) {
+                    todoListArray = JSON.parse(localStorage.getItem("todoList"));
+                }
+
+                let newLength = todoListArray.push([titleText, descText]);
+                localStorage.setItem("todoList", JSON.stringify(todoListArray));
+                console.log("Saving finished.");
+                if (todoListArray.length == 1) {
+                    refreshTable();
+                } else {
+                    populateNewRowToTable(titleText, descText, newLength);
+                }
+                title.value = "";
+                desc.value = "";
+                showToast("Item Added!", "happy");
+
+            }
+        });
+
+        updateButton.addEventListener("click", () => {
+
+            let titleText = document.getElementById("title").value;
+            let descText = document.getElementById("desc").value;
+
+            if (formValidate()) {
+                
+                console.log("updating list...");
+
+                todoListArray = JSON.parse(localStorage.getItem("todoList"));
+
+                let index = 0;
+                for (const [key, value] of todoListArray) {
+
+                    if (key == titleText) {
+                        console.log(todoListArray[index]);
+                        todoListArray[index][1] = descText;
+                        break;
+                    }
+                    index++
+                }
+
+
+                localStorage.setItem("todoList", JSON.stringify(todoListArray));
+                console.log("update finished.");
+                title.value = "";
+                desc.value = "";
+                showToast("Item updated!", "happy");
+                refreshTable();
+                saveButton.hidden = false;
+                updateButton.hidden = true;
+                title.disabled = false;
+            }
+        });
+
+        function deleteRowFromTable(index) {
+            todoListArray = Array.from(JSON.parse(localStorage.getItem("todoList")));
+            todoListArray.splice(index, 1);
+            localStorage.setItem("todoList", JSON.stringify(todoListArray));
+            refreshTable();
+            showToast("Item Deleted!", "danger");
+        }
+
+        function editRowFromTable(index) {
+            resetForm();
+            todoListArray = Array.from(JSON.parse(localStorage.getItem("todoList")));
+            document.getElementById("title").value = todoListArray[index][0];
+            document.getElementById("desc").value = todoListArray[index][1];
+            updateButton.hidden = false;
+            saveButton.hidden = true;
+            title.disabled = true;
+            desc.focus();
+        }
+
+        function populateNewRowToTable(titleText, descText, newLength) {
+            let tableBodyElement = document.querySelector("#table tbody");
+
+            let newRow = document.createElement("tr");
+            newRow.innerHTML = `    <th scope="row">${newLength}</th>
+                        <td>${titleText}</td>
+                        <td>${descText}</td>
+                        <td> 
+                            <button type="button" class="btn-sm btn-danger" id="bttndelete" onclick=deleteRowFromTable(${newLength - 1})>
+                                Delete
+                            </button>
+                            <button type="button" class="btn-sm btn-primary" id="bttndelete" onclick=editRowFromTable(${newLength - 1})>
+                                Edit
+                            </button>
+                        </td>
+                    `
+
+
+            tableBodyElement.appendChild(newRow);
+        }
+
+        function refreshTable() {
+            let tableBodyElement = document.querySelector("#table tbody");
+            if (localStorage.getItem("todoList")) {
+
+
+                if (JSON.parse(localStorage.getItem("todoList")).length > 0) {
+                    tableBodyElement = document.querySelector("#table tbody");
+                    let RowsString = "";
+
+                    todoListArray = JSON.parse(localStorage.getItem("todoList"));
+
+                    todoListArray.forEach((element, index) => {
+                        RowsString +=
+                            `<tr>
+                        <th scope="row">${index + 1}</th>
+                        <td>${element[0]}</td>
+                        <td>${element[1]}</td>
+                        <td> 
+                            <button type="button" class="btn-sm btn-danger" id="bttndelete" onclick=deleteRowFromTable(${index})>
+                                Delete
+                            </button> 
+                            <button type="button" class="btn-sm btn-primary" id="bttndelete" onclick=editRowFromTable(${index})>
+                                Edit
+                            </button> 
+                        </td>
+                    </tr>`
+                    });
+
+                    tableBodyElement.innerHTML = RowsString;
+                } else {
+                    tableBodyElement.innerHTML =
+                        `<tr class="bg-secondary">
+                        <td colspan="4" class="py-5 text-center">Oops! Your list is empty.</td>
+                    </tr>`
+                }
+            }
+
+        }
+
+    </script>
+</body>
+
+</html>
